@@ -1,0 +1,55 @@
+name: Test formula
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-formula-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.architecture }} macOS
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            architecture: arm64
+          - runner: macos-15-intel
+            architecture: x86_64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - name: Check out tap
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify runner architecture
+        shell: bash
+        run: test "$(uname -m)" = "${{ matrix.architecture }}"
+
+      - name: Install and test Colossus
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew tap obscuritylabs/tap "$GITHUB_WORKSPACE"
+          brew trust --formula obscuritylabs/tap/colossus
+          brew audit --strict obscuritylabs/tap/colossus
+          brew install obscuritylabs/tap/colossus
+          brew test obscuritylabs/tap/colossus
+          test "$(colossus --version)" = "colossus 0.10.7"
+
+          update_output="$(colossus --output human update 2>&1 || true)"
+          printf '%s\n' "$update_output"
+          grep -F "Homebrew owns this executable." <<<"$update_output"
+          grep -F "brew upgrade obscuritylabs/tap/colossus" <<<"$update_output"
+
+          brew uninstall obscuritylabs/tap/colossus
