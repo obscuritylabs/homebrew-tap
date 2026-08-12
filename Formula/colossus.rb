@@ -15,7 +15,7 @@ class Colossus < Formula
 
   def install
     libexec.install "colossus"
-    bin.write_env_script libexec/"colossus", COLOSSUS_INSTALLER_KIND: "homebrew"
+    (bin/"colossus").write_env_script libexec/"colossus", COLOSSUS_INSTALLER_KIND: "homebrew"
   end
 
   test do
