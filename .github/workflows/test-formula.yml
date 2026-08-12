@@ -47,7 +47,8 @@ jobs:
           brew test obscuritylabs/tap/colossus
           test "$(colossus --version)" = "colossus 0.10.7"
 
-          update_output="$(colossus update 2>&1 || true)"
+          update_output="$(colossus --output human update 2>&1 || true)"
+          printf '%s\n' "$update_output"
           grep -F "Homebrew owns this executable." <<<"$update_output"
           grep -F "brew upgrade obscuritylabs/tap/colossus" <<<"$update_output"
 
