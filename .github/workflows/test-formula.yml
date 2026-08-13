@@ -45,7 +45,7 @@ jobs:
           brew audit --strict obscuritylabs/tap/colossus
           brew install obscuritylabs/tap/colossus
           brew test obscuritylabs/tap/colossus
-          test "$(colossus --version)" = "colossus 0.10.7"
+          test "$(colossus --version)" = "colossus 0.10.8"
 
           update_output="$(colossus --output human update 2>&1 || true)"
           printf '%s\n' "$update_output"
