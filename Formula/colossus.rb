@@ -20,9 +20,8 @@ class Colossus < Formula
       (share/"licenses/colossus/ripgrep").install "tools/COPYING", "tools/LICENSE-MIT", "tools/UNLICENSE"
     end
     bundled_rg = (libexec/"rg").exist? ? "1" : "0"
-    (bin/"colossus").write_env_script libexec/"colossus",
-                                      COLOSSUS_INSTALLER_KIND: "homebrew",
-                                      COLOSSUS_BUNDLED_RIPGREP: bundled_rg
+    env = { COLOSSUS_INSTALLER_KIND: "homebrew", COLOSSUS_BUNDLED_RIPGREP: bundled_rg }
+    (bin/"colossus").write_env_script libexec/"colossus", env
   end
 
   test do
